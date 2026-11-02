@@ -28,7 +28,7 @@ npm run preview
 - `src/pages/skills.astro`: skills and certification.
 - `src/content/works/`: six CV-based project summaries.
 - `public/projects/`: abstract SVG project illustrations.
-- `chatbot-worker/`: separate NVIDIA backend; see CHATBOT-SETUP.md.
+- `chatbot-worker/`: separate Ollama backend; see CHATBOT-SETUP.md.
 
 The blog is empty until Sahan adds his own writing. The supplied CV is used as a content reference and is not copied to the public directory.
 
@@ -39,7 +39,7 @@ Website: https://sahan24854.github.io/Portofio-website-sahan/
 
 The GitHub Actions workflow builds and deploys pushes to main. In repository Settings → Pages, choose GitHub Actions as the source. The workflow sets SITE_URL and BASE_PATH; local development continues to run at `/`.
 
-The optional repository Actions variable PUBLIC_CHAT_API_URL connects the separately deployed chatbot Worker. The NVIDIA key belongs only in Cloudflare Worker Secrets. Never commit `.env` or `.dev.vars` files. The original-owner archive is kept locally and excluded from Git.
+The optional repository Actions variable PUBLIC_CHAT_API_URL connects the separately deployed chatbot Worker. The Ollama key belongs only in Cloudflare Worker Secrets. Never commit `.env` or `.dev.vars` files. The original-owner archive is kept locally and excluded from Git.
 
 To reproduce the Pages build locally:
 

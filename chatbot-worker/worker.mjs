@@ -12,7 +12,7 @@ export default {
   if (request.method === 'OPTIONS') return new Response(null,{status:204,headers});
   if (request.method !== 'POST') return reply('Method not allowed.',405);
   if (!request.headers.get('Content-Type')?.startsWith('application/json')) return reply('JSON required.',415);
-  if (!env.NVIDIA_API_KEY || !env.CHAT_LIMITER) return reply('Assistant is not configured.',503);
+  if (!env.OLLAMA_API_KEY || !env.CHAT_LIMITER) return reply('Assistant is not configured.',503);
   try {
    const {success} = await env.CHAT_LIMITER.limit({key:request.headers.get('CF-Connecting-IP') || 'local'});
    if (!success) return reply('Please wait before sending another question.',429);
@@ -25,13 +25,13 @@ export default {
    let body;try{body=JSON.parse(new TextDecoder().decode(bytes));}catch{return reply('Invalid JSON.',400);}
    const messages = body?.messages;
    if (!Array.isArray(messages) || !messages.length || messages.length>9 || messages.length%2!==1 || messages.some((m,i)=>!m || m.role!==(i%2?'assistant':'user') || typeof m.content!=='string' || !m.content.trim() || m.content.length>(i%2?6000:1200))) return reply('Invalid conversation.',400);
-   const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
-    method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${env.NVIDIA_API_KEY}`},
-    body:JSON.stringify({model:env.NVIDIA_MODEL || 'meta/llama-3.1-8b-instruct',messages:[{role:'system',content:instruction},...messages.map(({role,content})=>({role,content}))],temperature:0.2,max_tokens:600,stream:false}),
+   const response = await fetch('https://ollama.com/api/chat', {
+    method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${env.OLLAMA_API_KEY}`},
+    body:JSON.stringify({model:env.OLLAMA_MODEL || 'gemma4:31b',messages:[{role:'system',content:instruction},...messages.map(({role,content})=>({role,content}))],options:{temperature:0.2,num_predict:600},stream:false}),
     signal:AbortSignal.timeout(20000)
    });
    if (!response.ok) return reply('AI provider is temporarily unavailable.',response.status===429?429:502);
-   const result = await response.json();const answer=result.choices?.[0]?.message?.content;
+   const result = await response.json();const answer=result.message?.content;
    if (typeof answer!=='string' || !answer.trim()) return reply('No answer returned.',502);
    return Response.json({answer:answer.slice(0,6000)},{headers});
   } catch { return reply('Assistant is temporarily unavailable.',502); }

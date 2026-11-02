@@ -4,7 +4,7 @@
   "compatibility_date": "2026-01-01",
   "workers_dev": true,
   "vars": {
-    "NVIDIA_MODEL": "meta/llama-3.1-8b-instruct",
+    "OLLAMA_MODEL": "gemma4:31b",
     "ALLOWED_ORIGINS": "https://sahan24854.github.io,http://localhost:4322,http://127.0.0.1:4322"
   },
   "ratelimits": [{"name":"CHAT_LIMITER","namespace_id":"1001","simple":{"limit":10,"period":60}}]
