@@ -556,3 +556,5 @@ a.theme-text:hover { color: var(--link); }
  .research-controls button { padding: 9px 12px; font-size: 10px; }
  .chat-stage-detail { min-height: 170px; }
 }
+
+.cv-download {display:inline-flex;align-items:center;gap:14px;padding:13px 19px;margin-top:20px;border:1px solid var(--line);border-radius:30px;background:var(--surface);color:var(--text);font-size:13px;transition:background .2s,border-color .2s}.cv-download > span:first-child {font-size:10px;color:var(--muted)}.cv-download:hover {background:var(--surface-2);border-color:var(--link)}
