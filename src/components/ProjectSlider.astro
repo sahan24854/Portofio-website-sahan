@@ -1,0 +1,44 @@
+---
+import WorkCard from './WorkCard.astro';
+import type { Work } from '../lib/works';
+interface Props { works: Work[] }
+const { works } = Astro.props;
+const trackId = `projects-${Astro.url.pathname === '/' ? 'home' : 'index'}`;
+---
+<div class="project-slider" data-project-slider role="region" aria-label="Engineering projects carousel" aria-roledescription="carousel">
+  <div class="project-slider-toolbar"><p data-project-range aria-live="polite">{works.length} projects · Swipe or use the arrows</p><div class="project-slider-arrows"><button type="button" data-project-prev aria-controls={trackId} aria-label="Previous projects">←</button><button type="button" data-project-next aria-controls={trackId} aria-label="Next projects">→</button></div></div>
+  <div class="project-slider-track" id={trackId} tabindex="0" aria-label="Project cards. Use left and right arrows to browse.">
+    {works.map((work, index) => <div class="project-slide" role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${works.length}: ${work.data.title}`}><WorkCard work={work} /></div>)}
+  </div>
+</div>
+<script>
+ document.querySelectorAll<HTMLElement>('[data-project-slider]').forEach(slider => {
+  const track = slider.querySelector<HTMLElement>('.project-slider-track')!;
+  const cards = [...track.children] as HTMLElement[];
+  const prev = slider.querySelector<HTMLButtonElement>('[data-project-prev]')!;
+  const next = slider.querySelector<HTMLButtonElement>('[data-project-next]')!;
+  const range = slider.querySelector<HTMLElement>('[data-project-range]')!;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  function update() {
+   const start = Math.round(track.scrollLeft / (cards[0].getBoundingClientRect().width + 28));
+   const visible = innerWidth >= 768 ? 2 : 1;
+   range.textContent = `${start + 1}–${Math.min(start + visible,cards.length)} / ${cards.length} projects`;
+   prev.disabled = track.scrollLeft < 2;
+   next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+  }
+  function move(direction: number) {track.scrollBy({left:direction * (cards[0].getBoundingClientRect().width + 28),behavior:reduced.matches?'instant':'smooth'});}
+  prev.addEventListener('click',()=>move(-1)); next.addEventListener('click',()=>move(1));
+  track.addEventListener('keydown',event=>{if(event.target!==track)return;if(event.key==='ArrowRight'||event.key==='ArrowLeft'){event.preventDefault();move(event.key==='ArrowRight'?1:-1);}});
+  track.addEventListener('scroll',update,{passive:true});new ResizeObserver(update).observe(track);update();
+ });
+</script>
+<style>
+.project-slider {min-width:0}
+.project-slider-toolbar {display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px;color:var(--muted);font-size:12px}
+.project-slider-arrows {display:flex;gap:8px}.project-slider-arrows button {display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--text);font-size:20px;cursor:pointer}.project-slider-arrows button:hover:not(:disabled){background:var(--accent);color:var(--accent-on)}.project-slider-arrows button:disabled{opacity:.3;cursor:default}
+.project-slider-track {display:flex;gap:28px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent;padding-bottom:20px;align-items:stretch}
+.project-slide {flex:0 0 calc((100% - 28px)/2);min-width:0;scroll-snap-align:start;scroll-snap-stop:always}
+.project-slide :global(.project-card){height:100%}
+.project-slider :global(a:focus-visible),button:focus-visible,.project-slider-track:focus-visible {outline:2px solid var(--link);outline-offset:-3px}
+@media(max-width:767px){.project-slide{flex-basis:100%}}
+</style>

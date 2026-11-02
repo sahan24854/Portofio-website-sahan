@@ -1,10 +1,9 @@
 ---
 import { sitePath } from '../lib/paths';
-import WorkCard from './WorkCard.astro';
+import ProjectSlider from './ProjectSlider.astro';
 import { getWorks } from '../lib/works';
 
-// Two full rows of the md:grid-cols-2 grid — an odd count leaves an orphan card.
-const works = (await getWorks()).slice(0, 4);
+const works = await getWorks();
 ---
 
 <section id="works" class="theme-surface px-8 md:px-16 pt-20 md:pt-28 pb-20 md:pb-28">
@@ -21,10 +20,7 @@ const works = (await getWorks()).slice(0, 4);
       </p>
     </div>
 
-    <!-- 2×2 grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-7 gap-y-12">
-      {works.map((work) => <WorkCard work={work} />)}
-    </div>
+    <ProjectSlider works={works} />
 
     <!-- View all six projects -->
     <div class="flex justify-center mt-14">

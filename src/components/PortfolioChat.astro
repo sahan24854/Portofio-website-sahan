@@ -1,7 +1,7 @@
 <button class="chat-launcher" aria-controls="portfolio-chat" aria-expanded="false" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 11a8 8 0 0 1-8 8H5l-4 3 2-7a8 8 0 1 1 17-4Z"/><path d="M7 10h10M7 14h6"/></svg><span>Ask about Sahan</span></button>
 <section id="portfolio-chat" class="portfolio-chat" role="dialog" aria-labelledby="chat-title" hidden>
   <header class="chat-heading"><div><p class="section-kicker">A little guidance</p><h2 id="chat-title">Ask about Sahan</h2><p>AI portfolio assistant</p></div><button type="button" class="chat-close" aria-label="Close chat">×</button></header>
-  <div class="chat-messages" role="log" aria-label="Conversation" aria-live="polite" aria-relevant="additions"><p class="chat-message assistant">Hi! I can help you explore Sahan’s engineering background, projects, and ways to get in touch.</p></div>
+  <div class="chat-messages" role="log" aria-label="Conversation" aria-live="polite" aria-relevant="additions"><div class="chat-message assistant"><span class="chat-speaker">Portfolio assistant</span><p class="chat-bubble">Hi! I can help you explore Sahan’s engineering background, projects, and ways to get in touch.</p></div></div>
   <div class="chat-suggestions"><button type="button">What has Sahan built?</button><button type="button">Tell me about his skills</button></div>
   <p class="chat-status" role="status"></p>
   <form class="chat-form"><label class="sr-only" for="chat-question">Your question</label><textarea id="chat-question" rows="2" maxlength="1200" placeholder="Ask about a project or his experience…" required></textarea><button type="submit" aria-label="Send question">↑</button></form>
@@ -27,13 +27,18 @@ launcher.addEventListener('click', () => setOpen(panel.hidden));
 panel.querySelector('.chat-close')!.addEventListener('click', () => setOpen(false));
 panel.addEventListener('keydown', event => {if (event.key === 'Escape') setOpen(false);});
 function append(role: string, content: string) {
- const item = document.createElement('p'); item.className = `chat-message ${role}`;
- item.textContent = content; log.append(item); log.scrollTop = log.scrollHeight;
+ const item = document.createElement('div'); item.className = `chat-message ${role}`;
+ const label = document.createElement('span'); label.className = 'chat-speaker'; label.textContent = role === 'user' ? 'You' : 'Portfolio assistant';
+ const bubble = document.createElement('p'); bubble.className = 'chat-bubble'; bubble.textContent = content;
+ item.append(label, bubble); log.append(item);
+ // Start each answer at its beginning, so long responses remain easy to read.
+ log.scrollTop = Math.max(0, item.offsetTop - log.offsetTop - 16);
 }
 async function ask(question: string) {
  if (controller || !question.trim()) return;
  if (!endpoint) {status.textContent = 'The assistant is not connected yet. Please use Email Sahan or LinkedIn below.'; return;}
  const previous = messages.slice(-8);
+ panel.querySelector<HTMLElement>('.chat-suggestions')!.hidden = true;
  append('user', question); input.value = ''; send.disabled = true;
  status.textContent = 'Thinking…'; panel.setAttribute('aria-busy','true');
  const request = new AbortController(); controller = request;
@@ -59,6 +64,7 @@ input.addEventListener('keydown', event => {if(event.key === 'Enter' && !event.s
 panel.querySelectorAll<HTMLButtonElement>('.chat-suggestions button').forEach(button => button.addEventListener('click', () => void ask(button.textContent || '')));
 panel.querySelector('.chat-clear')!.addEventListener('click', () => {
  controller?.abort(); controller = undefined; messages = []; log.replaceChildren();
+ panel.querySelector<HTMLElement>('.chat-suggestions')!.hidden = false;
  append('assistant','A fresh start. What would you like to know about Sahan?');
  status.textContent = ''; send.disabled = false; input.value = ''; panel.removeAttribute('aria-busy'); input.focus();
 });
@@ -66,14 +72,22 @@ panel.querySelector('.chat-clear')!.addEventListener('click', () => {
 <style>
 .chat-launcher {position:fixed;left:24px;bottom:24px;z-index:70;display:flex;gap:10px;align-items:center;padding:14px 18px;border:1px solid var(--line);border-radius:30px;background:var(--control-bg);color:var(--text);box-shadow:0 8px 30px #0002;cursor:pointer;font-size:12px;backdrop-filter:blur(16px)}
 .portfolio-chat[hidden] {display:none}
-.portfolio-chat {position:fixed;left:24px;bottom:86px;z-index:80;width:min(390px,calc(100vw - 32px));max-height:calc(100dvh - 110px);display:flex;flex-direction:column;border:1px solid var(--line);border-radius:22px;background:var(--surface);color:var(--text);box-shadow:0 24px 80px #0003;overflow:hidden}
+.portfolio-chat {position:fixed;left:24px;bottom:86px;z-index:80;width:min(440px,calc(100vw - 32px));height: min(700px,calc(100dvh - 110px));max-height:calc(100dvh - 110px);display:flex;flex-direction:column;border:1px solid var(--line);border-radius:22px;background:var(--surface);color:var(--text);box-shadow:0 24px 80px #0003;overflow:hidden}
 .chat-heading {display:flex;justify-content:space-between;align-items:start;padding:22px 22px 16px;border-bottom:1px solid var(--line)}
 .chat-heading .section-kicker {font-size:9px;margin-bottom:8px}.chat-heading h2 {font-size:20px;font-weight:500}.chat-heading p:last-child {font-size:11px;color:var(--muted);margin-top:4px}
 .chat-close {font-size:26px;width:36px;height:36px;cursor:pointer;border-radius:50%;background:var(--surface-2)}
-.chat-messages {overflow-y:auto;padding:18px;min-height:100px;max-height:34dvh;overscroll-behavior:contain}.chat-message {font-size:13px;line-height:1.7;padding:12px 14px;border-radius:15px;background:var(--surface-2);margin-bottom:12px;white-space:pre-wrap;overflow-wrap:anywhere}.chat-message.user {background:var(--accent);color:var(--accent-on);margin-left:28px}.chat-message.assistant {margin-right:12px}
+/* Global descendants also style messages inserted by JavaScript. */
+.chat-messages {position:relative;overflow-y:auto;flex:1;min-height:0;padding:20px;overscroll-behavior:contain;background:var(--page-bg);scrollbar-width:thin}
+.chat-messages :global(.chat-message) {display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin:0 0 22px;width:100%;font-size:13px;line-height:1.75}
+.chat-messages :global(.chat-message.user) {align-items:flex-end}
+.chat-messages :global(.chat-speaker) {font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--muted);padding:0 4px}
+.chat-messages :global(.chat-bubble) {margin:0;max-width:92%;padding:13px 16px;border:1px solid var(--line);border-radius:4px 16px 16px 16px;background:var(--surface);color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere}
+.chat-messages :global(.user .chat-bubble) {max-width:84%;border-color:transparent;border-radius:16px 4px 16px 16px;background:var(--accent);color:var(--accent-on)}
+.chat-suggestions[hidden] {display:none}
+
 .chat-suggestions {display:flex;flex-wrap:wrap;gap:6px;padding:0 18px}.chat-suggestions button {font-size:10px;padding:8px 10px;border:1px solid var(--line);border-radius:20px;cursor:pointer}.chat-status {font-size:11px;color:var(--muted);padding:8px 20px;min-height:28px}
 .chat-form {display:flex;gap:8px;margin:0 18px;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--page-bg)}.chat-form textarea {min-width:0;flex:1;resize:none;font-size:13px;line-height:1.5;background:transparent;padding:4px}.chat-form button {width:36px;height:36px;align-self:end;border-radius:50%;background:var(--accent);color:var(--accent-on);cursor:pointer}.chat-form button:disabled {opacity:.4;cursor:wait}
 .chat-contact {display:flex;gap:16px;padding:14px 20px 8px;font-size:11px;color:var(--link)}.chat-clear {margin-left:auto;cursor:pointer}.chat-disclaimer {font-size:10px;line-height:1.5;color:var(--muted);padding:0 20px 18px}
 button:focus-visible,a:focus-visible,textarea:focus-visible {outline:2px solid var(--link);outline-offset:3px}
-@media(max-width:700px){.chat-launcher{left:16px;bottom:16px;padding:12px}.chat-launcher span{display:none}.portfolio-chat{left:16px;bottom:72px;max-height:calc(100dvh - 88px)}.chat-heading{padding:16px}.chat-messages{max-height:32dvh}.chat-form textarea{font-size:16px}}
+@media(max-width:700px){.chat-launcher{left:16px;bottom:16px;padding:12px}.chat-launcher span{display:none}.portfolio-chat{left:16px;bottom:72px;max-height:calc(100dvh - 88px)}.chat-heading{padding:16px}.portfolio-chat{height:calc(100dvh - 100px)}.chat-messages{padding:16px}.chat-heading,.chat-form,.chat-contact,.chat-disclaimer,.chat-status,.chat-suggestions{flex-shrink:0}.chat-form textarea{font-size:16px}}
 </style>
