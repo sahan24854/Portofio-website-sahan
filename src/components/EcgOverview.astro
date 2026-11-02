@@ -1,0 +1,20 @@
+---
+import { ecgResults } from '../data/remaining-projects';
+const selected=ecgResults[0];
+const facts=[{value:'12 leads',label:'ECG input channels'},{value:'100 Hz',label:'Low-rate recordings'},{value:'5 classes',label:'Single-label experiments'},{value:'1,870',label:'Fold-10 test records'}];
+---
+<div class="case-facts" data-reveal>{facts.map(fact=><div><strong>{fact.value}</strong><span>{fact.label}</span></div>)}</div>
+<section class="research-explorer" id="ecg-results" aria-labelledby="ecg-results-title" data-reveal>
+ <div class="research-intro"><p class="section-kicker">Saved evaluation / Class-level view</p><h2 id="ecg-results-title">Look beyond<br />overall accuracy.</h2><p>The wider Model 4 has higher aggregate accuracy, while the effect differs across classes. Select a class to compare saved F1 scores.</p><div class="research-controls" aria-label="Select an ECG class">{ecgResults.map((item,index)=><button type="button" data-ecg-class={index} aria-pressed={index===0?'true':'false'}>{item.key}</button>)}</div><p class="research-note">Single-label research experiment. No live ECG inference or clinical diagnosis is performed here.</p></div>
+ <div class="ecg-result-panel" aria-live="polite"><h3 data-ecg-name>{selected.name}</h3><p class="research-note"><span data-ecg-support>{selected.support}</span> records in the saved test report</p><div class="ecg-score-label"><span>Model 3 / Res-SE</span><strong data-ecg-base>{selected.base.toFixed(4)}</strong></div><div class="comparison-track"><div class="bar-base" data-ecg-base-bar style={`width:${selected.base*100}%`}></div></div><div class="ecg-score-label"><span>Model 4 / Res-CBAM</span><strong data-ecg-tuned>{selected.tuned.toFixed(4)}</strong></div><div class="comparison-track"><div class="bar-tuned" data-ecg-tuned-bar style={`width:${selected.tuned*100}%`}></div></div><p class="research-note">F1 scale: 0–1. Architectures differ in capacity and design, so this is not an isolated test of CBAM.</p></div>
+</section>
+<script>
+import { ecgResults } from '../data/remaining-projects';
+const buttons=[...document.querySelectorAll<HTMLButtonElement>('[data-ecg-class]')];
+buttons.forEach(button=>button.addEventListener('click',()=>{
+ const row=ecgResults[Number(button.dataset.ecgClass)];if(!row)return;buttons.forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+ const fields={'[data-ecg-name]':row.name,'[data-ecg-support]':String(row.support),'[data-ecg-base]':row.base.toFixed(4),'[data-ecg-tuned]':row.tuned.toFixed(4)};
+ for(const [selector,value]of Object.entries(fields)){const e=document.querySelector(selector);if(e)e.textContent=value;}
+ const base=document.querySelector<HTMLElement>('[data-ecg-base-bar]'),tuned=document.querySelector<HTMLElement>('[data-ecg-tuned-bar]');if(base)base.style.width=`${row.base*100}%`;if(tuned)tuned.style.width=`${row.tuned*100}%`;
+}));
+</script>

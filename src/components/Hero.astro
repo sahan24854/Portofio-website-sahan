@@ -1,0 +1,28 @@
+---
+import { sitePath } from '../lib/paths';
+import Dock from "./Dock.astro";
+---
+
+<section id="hero" class="relative h-svh bg-black overflow-hidden" aria-label="Sahan Dissanayake — introduction">
+    <div class="absolute inset-0 z-0 bg-black">
+        <img src={sitePath('/sahan-portrait.jpg')} alt="Sahan Dissanayake" width="1280" height="1907" fetchpriority="high" class="w-full h-full object-contain object-center" />
+        <div class="absolute inset-0 bg-linear-to-r from-black/50 via-transparent to-black/50"></div>
+        <div class="absolute inset-0 bg-linear-to-b from-black/15 via-transparent to-black/70"></div>
+    </div>
+    <div class="absolute top-0 left-0 right-0 z-30 flex justify-between items-start px-8 pt-7">
+        <span class="text-white/70 text-xs tracking-wide">@ Sahan Dissanayake</span>
+        <p class="text-white/65 text-xs max-w-60 text-right leading-relaxed hidden md:block">Recent BSc (Hons) engineering graduate, interested in AI/ML engineering and telecommunications engineering.</p>
+    </div>
+    <div class="absolute left-1/2 -translate-x-1/2 z-30" style="top: 80%;"><Dock /></div>
+    <h1 class="sr-only">Sahan Dissanayake — Engineering Graduate | AI/ML · Telco · Data Engineering</h1>
+    <div class="absolute left-0 right-0 z-10 pointer-events-none" style="top: 63%;" aria-hidden="true">
+        <div class="overflow-hidden w-full"><div class="flex w-max whitespace-nowrap hero-marquee" style="animation: marquee 19s linear infinite;">
+            <span class="text-[clamp(64px,11vw,72px)] sm:text-[clamp(72px,11vw,148px)] shrink-0 font-bold text-white leading-none select-none">AI/ML · Telco · Data Engineering &nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span class="text-[clamp(64px,11vw,72px)] sm:text-[clamp(72px,11vw,148px)] shrink-0 font-bold text-white leading-none select-none">AI/ML · Telco · Data Engineering &nbsp;&nbsp;&nbsp;&nbsp;</span>
+        </div></div>
+    </div>
+    <div class="flex absolute bottom-0 left-0 right-0 z-30 items-end justify-between px-8 pb-10">
+        <p class="text-white/70 hidden sm:flex text-sm max-w-xs leading-relaxed">Exploring AI/ML and telecommunications through university projects and hands-on experience at Dialog Axiata.</p>
+        <a href="#about" class="text-white/70 text-sm hover:text-white transition-colors duration-200 shrink-0 ml-8">More about me →</a>
+    </div>
+</section>

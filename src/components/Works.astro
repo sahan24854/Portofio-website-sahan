@@ -1,0 +1,41 @@
+---
+import { sitePath } from '../lib/paths';
+import WorkCard from './WorkCard.astro';
+import { getWorks } from '../lib/works';
+
+// Two full rows of the md:grid-cols-2 grid — an odd count leaves an orphan card.
+const works = (await getWorks()).slice(0, 4);
+---
+
+<section id="works" class="theme-surface px-8 md:px-16 pt-20 md:pt-28 pb-20 md:pb-28">
+  <div class="max-w-7xl mx-auto">
+
+    <p class="section-kicker" data-reveal>03 / Selected work</p>
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4" data-reveal>
+      <h2 class="theme-text text-4xl md:text-5xl font-bold">
+        Projects &amp; practical experience.
+      </h2>
+      <p class="theme-muted text-xs uppercase tracking-widest max-w-60 md:text-right leading-relaxed">
+        A selection of university and internship projects in machine learning, telecommunications, and software development.
+      </p>
+    </div>
+
+    <!-- 2×2 grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-7 gap-y-12">
+      {works.map((work) => <WorkCard work={work} />)}
+    </div>
+
+    <!-- View all six projects -->
+    <div class="flex justify-center mt-14">
+      <a
+        href={sitePath('/works')}
+        class="flex items-center gap-2 px-5 py-2.5 rounded-full border theme-border theme-muted text-sm hover:border-[#0a0a0a] hover:text-[#0a0a0a] transition-all duration-200"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+        View all six projects
+      </a>
+    </div>
+
+  </div>
+</section>

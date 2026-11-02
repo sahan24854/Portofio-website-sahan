@@ -1,0 +1,37 @@
+<button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
+  <svg class="theme-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+  <svg class="theme-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/></svg>
+  <span data-theme-label>Theme</span>
+</button>
+<script>
+const root = document.documentElement;
+const button = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+function syncThemeButton() {
+  const dark = root.dataset.theme === 'dark';
+  button?.setAttribute('aria-label', `Switch to ${dark ? 'light' : 'dark'} mode`);
+  button?.setAttribute('title', `Switch to ${dark ? 'light' : 'dark'} mode`);
+  const label = button?.querySelector('[data-theme-label]');
+  if (label) label.textContent = dark ? 'Light mode' : 'Dark mode';
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#121610' : '#f8f7f3');
+}
+button?.addEventListener('click', () => {
+  root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  root.style.colorScheme = root.dataset.theme;
+  try { localStorage.setItem('portfolio-theme', root.dataset.theme); } catch { /* Theme switching also works without storage access. */ }
+  syncThemeButton();
+});
+systemTheme.addEventListener('change', (event) => {
+  try { if (localStorage.getItem('portfolio-theme')) return; } catch {}
+  root.dataset.theme = event.matches ? 'dark' : 'light';
+  root.style.colorScheme = root.dataset.theme;
+  syncThemeButton();
+});
+window.addEventListener('storage', (event) => {
+  if (event.key !== 'portfolio-theme') return;
+  root.dataset.theme = event.newValue === 'light' || event.newValue === 'dark' ? event.newValue : systemTheme.matches ? 'dark' : 'light';
+  root.style.colorScheme = root.dataset.theme;
+  syncThemeButton();
+});
+syncThemeButton();
+</script>

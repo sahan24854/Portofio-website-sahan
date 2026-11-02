@@ -1,0 +1,22 @@
+---
+import { sitePath } from '../lib/paths';
+import ScrollVisual from "./ScrollVisual.astro";
+const areas = [
+  { number: '01', title: 'AI & machine learning', label: 'CAREER INTEREST / 01', description: 'Exploring deep learning and language models through hands-on projects and experimentation.', tags: ['PyTorch', 'ConvLSTM'], path: 'M0 55h28l14-25 18 55 24-80 22 70 15-20h39' },
+  { number: '02', title: 'Telecommunications', label: 'CAREER INTEREST / 02', description: 'Building on internship experience in radio access network analytics and cellular coverage monitoring.', tags: ['MR/MDT analytics', 'Coverage classification'], path: 'M15 20L80 55 145 20M15 90L80 55 145 90M15 20v70M145 20v70M80 5v100' },
+  { number: '03', title: 'Data & development', label: 'SUPPORTING SKILLS', description: 'Preparing data, building pipelines, and developing applications that support engineering projects.', tags: ['Python & SQL', 'Microsoft Fabric'], path: 'M5 35h40v40H5zM60 35h40v40H60zM115 35h40v40h-40zM45 55h15M100 55h15' },
+];
+---
+<section id="expertise" class="expertise-section" aria-labelledby="expertise-heading">
+  <div class="section-container">
+    <div class="expertise-heading" data-reveal><div><p class="section-kicker">02 / Interests &amp; foundations</p><h2 id="expertise-heading">Where I want<br /><span>to grow next.</span></h2></div><a class="light-link" href={sitePath('/skills')}>Explore my toolkit <span aria-hidden="true">↗</span></a></div>
+    <ScrollVisual />
+    <div class="expertise-grid">
+      {areas.map((area) => <article class="expertise-card" data-reveal data-tilt>
+        <div class="expertise-meta"><span>{area.label}</span><span>{area.number}</span></div>
+        <svg class="expertise-diagram" viewBox="0 0 160 110" fill="none" aria-hidden="true"><path class="diagram-base" d={area.path} /><path class="diagram-pulse" d={area.path} /></svg>
+        <h3>{area.title}</h3><p>{area.description}</p><div class="expertise-tags">{area.tags.map((tag) => <span>{tag}</span>)}</div>
+      </article>)}
+    </div>
+  </div>
+</section>

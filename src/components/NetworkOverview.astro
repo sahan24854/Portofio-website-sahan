@@ -1,0 +1,41 @@
+---
+import { networkRepo, networkFacts, networkStages, networkClasses } from '../data/network-project';
+const grid = Array.from({ length: 144 }, (_, i) => {
+  const row = Math.floor(i / 18), col = i % 18;
+  if (row >= 2 && row <= 5 && col >= 3 && col <= 6) return 'reduction';
+  if (row >= 1 && row <= 4 && col >= 11 && col <= 14) return 'expansion';
+  return (row * 3 + col * 7) % 11 < 3 ? 'hole' : 'covered';
+});
+---
+<div class="network-overview">
+  <div class="case-facts" data-reveal>{networkFacts.map((fact) => <div><strong>{fact.value}</strong><span>{fact.label}</span></div>)}</div>
+  <section class="network-lab" id="at-a-glance" aria-labelledby="network-lab-heading" data-reveal>
+    <div class="network-lab-copy"><p class="section-kicker">AI meets telecommunications</p><h2 id="network-lab-heading">Making network<br />changes visible.</h2><p>Classify the observed coverage pattern, then group changed cells into spatial zones for engineering review.</p><p class="lab-instruction">Select a class to explore the grid.</p><div class="class-controls" aria-label="Highlight a coverage class"><button type="button" data-class-filter="all" aria-pressed="true">All classes</button>{networkClasses.map((item) => <button type="button" data-class-filter={item.key} aria-pressed="false"><span style={`background:${item.color}`} aria-hidden="true"></span>{item.name}</button>)}</div></div>
+    <div class="coverage-demo"><div class="coverage-grid" aria-hidden="true">{grid.map((key) => <span data-grid-class={key}></span>)}</div><p class="coverage-caption">Illustrative grid · synthetic cells · not live network data</p><p class="class-explanation" data-class-description aria-live="polite">Four classes describe patterns within the observed 14-day window. This model does not forecast the next day.</p></div>
+  </section>
+  <section class="pipeline-section" id="pipeline" aria-labelledby="pipeline-heading" data-reveal>
+    <p class="section-kicker">System architecture</p><div class="pipeline-heading"><h2 id="pipeline-heading">From telemetry to map layers.</h2><p>Select a stage to see how it works.</p></div>
+    <div class="pipeline-controls" aria-label="Explore pipeline stages">{networkStages.map((stage, i) => <button type="button" data-stage={i} aria-pressed={i === 0 ? 'true' : 'false'} aria-controls="pipeline-detail"><span>{String(i + 1).padStart(2, '0')}</span>{stage.name}<span aria-hidden="true">↗</span></button>)}</div>
+    <div class="pipeline-detail" id="pipeline-detail" aria-live="polite"><span data-stage-tool>{networkStages[0].tool}</span><h3 data-stage-title>{networkStages[0].title}</h3><p data-stage-description>{networkStages[0].description}</p><a data-stage-source href={`${networkRepo}/blob/main/${networkStages[0].file}`} target="_blank" rel="noopener noreferrer">Explore this implementation ↗</a></div>
+  </section>
+</div>
+<script>
+import { networkRepo, networkStages, networkClasses } from '../data/network-project';
+const classButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-class-filter]')];
+classButtons.forEach((button) => button.addEventListener('click', () => {
+  const key = button.dataset.classFilter;
+  classButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+  document.querySelectorAll<HTMLElement>('[data-grid-class]').forEach((cell) => cell.classList.toggle('muted', key !== 'all' && cell.dataset.gridClass !== key));
+  const description = document.querySelector('[data-class-description]');
+  if (description) description.textContent = networkClasses.find((item) => item.key === key)?.description ?? 'Four classes describe patterns within the observed 14-day window. This model does not forecast the next day.';
+}));
+const stageButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-stage]')];
+stageButtons.forEach((button) => button.addEventListener('click', () => {
+  const stage = networkStages[Number(button.dataset.stage)];
+  if (!stage) return;
+  stageButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+  const fields = { '[data-stage-tool]': stage.tool, '[data-stage-title]': stage.title, '[data-stage-description]': stage.description };
+  for (const [selector, value] of Object.entries(fields)) { const field = document.querySelector(selector); if (field) field.textContent = value; }
+  document.querySelector<HTMLAnchorElement>('[data-stage-source]')?.setAttribute('href', `${networkRepo}/blob/main/${stage.file}`);
+}));
+</script>

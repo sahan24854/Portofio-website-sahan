@@ -1,0 +1,30 @@
+---
+import { sitePath } from '../lib/paths';
+---
+<section id="about" class="about-section" aria-labelledby="about-heading">
+  <div class="section-container">
+    <p class="section-kicker" data-reveal>01 / A little about me</p>
+    <div class="about-grid">
+      <div class="about-visual" data-reveal data-tilt>
+        <div class="portrait-frame"><img src={sitePath('/about-sahan.jpg')} alt="Sahan Dissanayake outdoors" width="892" height="1280" loading="lazy" /></div>
+        <div class="portrait-caption"><span class="status-dot" aria-hidden="true"></span>Curiosity, turned into engineering.</div>
+        <div class="portrait-sticker sticker-ai" data-reveal><span aria-hidden="true">✳</span><div><strong>AI / ML</strong><small>Curiosity into practice</small></div></div>
+        <div class="portrait-sticker sticker-telecom" data-reveal><span aria-hidden="true">↗</span><div><strong>Telecommunications</strong><small>Connecting the dots</small></div></div>
+        <span class="portrait-corner" aria-hidden="true">↗</span>
+      </div>
+      <div class="about-copy" data-reveal>
+        <h2 id="about-heading">A new graduate.<br /><span>Ready to keep learning.</span></h2>
+        <p>I’m Sahan, a recent BSc (Hons) graduate in Electrical and Electronic Engineering from the University of Peradeniya, Sri Lanka.</p>
+        <p>I’m interested in starting my career in AI/ML engineering or telecommunications engineering. My university projects have given me experience with deep learning, language models, and practical engineering problems.</p>
+        <p>During my Network Analytics and Automation internship at Dialog Axiata, I gained hands-on experience with telecommunications data, PySpark pipelines, and ConvLSTM-based coverage classification in Azure ML. I’m keen to build on that foundation, learn from experienced engineers, and contribute to a team.</p>
+        <a href={sitePath('/skills')} class="text-link">More about my skills <span aria-hidden="true">↗</span></a>
+        <div class="personal-note"><span aria-hidden="true">✳</span><p>Off the screen: university baseball and community projects with Rotaract.</p></div>
+      </div>
+    </div>
+    <div class="journey-heading" data-reveal><p class="section-kicker">The journey so far</p><span>Learning. Building. Applying.</span></div>
+    <div class="journey-grid">
+      <article class="journey-card" data-reveal><span class="journey-marker" aria-hidden="true"></span><p class="journey-date">2022 — 2026</p><h3>University of Peradeniya</h3><p>BSc (Hons) in Electrical and Electronic Engineering</p><span class="journey-tag">Signal Processing &amp; Artificial Intelligence</span></article>
+      <article class="journey-card" data-reveal><span class="journey-marker" aria-hidden="true"></span><p class="journey-date">APRIL — OCTOBER 2026</p><h3>Dialog Axiata PLC</h3><p>Network Analytics and Automation Intern · Colombo</p><span class="journey-tag">Data engineering &amp; machine learning</span></article>
+    </div>
+  </div>
+</section>

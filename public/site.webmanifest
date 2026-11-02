@@ -1,0 +1,15 @@
+{
+  "name": "Sahan Dissanayake",
+  "short_name": "Sahan",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "theme_color": "#ffcf00",
+  "background_color": "#111111",
+  "display": "standalone"
+}

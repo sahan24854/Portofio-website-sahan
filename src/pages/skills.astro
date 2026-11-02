@@ -1,0 +1,48 @@
+---
+import { sitePath } from '../lib/paths';
+import Layout from "../layouts/Layout.astro";
+import Dock from "../components/Dock.astro";
+import Contact from "../components/Contact.astro";
+const categories = ["All skills", "AI/ML", "Telecom", "Data & cloud", "Development"];
+const skills = [
+  { category: "Telecom", evidence: true, title: "Telecommunications & network analytics", tags: ["RAN analytics", "Coverage-change detection", "MR/MDT telemetry", "Coverage classification", "QGIS"], description: "Foundational experience gained during my internship at Dialog Axiata, working with cellular network data and coverage analysis." },
+  { category: "Development", evidence: false, title: "Programming", tags: ["Python", "SQL"], description: "Processing data, building machine learning workflows, and querying analytical datasets." },
+  { category: "AI/ML", evidence: true, title: "Machine learning & deep learning", tags: ["PyTorch", "ConvLSTM", "Multimodal fusion", "BiLSTM", "LIME", "Focal & Dice loss", "Geographic validation", "TensorFlow / Keras", "Scikit-Learn"], description: "Built a four-class spatial-temporal classifier with imbalance-aware losses, early stopping, and geographic validation. My final-year research also explores multimodal blood-pressure regression and learned-feature explanations." },
+  { category: "Data & cloud", evidence: true, title: "Data engineering", tags: ["PySpark", "Microsoft Fabric", "OneLake", "Parquet", "Delta tables", "Medallion architecture"], description: "Prepared deduplicated grid/date observations, date-partitioned Parquet exports, and repeatable data handoffs for cloud scoring." },
+  { category: "AI/ML", evidence: false, title: "Signal & image processing", tags: ["OpenCV", "DCT / IDCT", "Quantization", "Rate control", "ECG", "PPG"], description: "Image encoding and reconstruction, adaptive quantization, and compression-quality analysis, alongside biomedical signal processing." },
+  { category: "AI/ML", evidence: false, title: "Language models", tags: ["Hugging Face Transformers", "PEFT / LoRA", "Response-only SFT", "Paired evaluation", "Catalog grounding"], description: "Fine-tuned SmolLM2-360M with response-only LoRA, compared model outputs, and built a catalog-grounded travel chatbot." },
+  { category: "Data & cloud", evidence: true, title: "Cloud & geospatial analytics", tags: ["Azure ML pipelines", "Model registration", "DBSCAN", "PostgreSQL / PostGIS", "QGIS", "Power BI"], description: "Built batch scoring and spatial clustering workflows. Prepared transactional prediction-and-zone publication code; live activation of the new publication path remains pending." },
+  { category: "Data & cloud", evidence: true, title: "Scientific computing", tags: ["Pandas", "NumPy", "SciPy", "PyArrow", "Google Colab", "Kaggle"], description: "Data preparation, reproducible experiments, and model evaluation." },
+  { category: "Development", evidence: true, title: "Development & collaboration", tags: ["Git / GitHub", "Regression tests", "Docker", "Problem solving", "Teamwork"], description: "Version-controlled development, regression checks, and attention to input validation, safe retries, and reliable data publication." },
+  { category: "Development", evidence: false, title: "Web application projects", tags: ["React", "TypeScript", "Supabase"], description: "Building applications around AI workflows, including a personalized travel planning chatbot." },
+];
+---
+<Layout title="Skills | Sahan Dissanayake" description="Technical skills developed through Sahan Dissanayake’s engineering degree, AI/ML projects, and telecommunications internship.">
+  <div class="theme-surface theme-text px-6 md:px-16 pt-8 pb-24">
+    <a href={sitePath('/')} class="text-sm theme-muted">Sahan Dissanayake</a>
+    <div class="max-w-7xl mx-auto">
+      <header class="py-16 md:py-20 text-center"><p class="theme-muted text-xs uppercase tracking-widest mb-5">My toolkit</p><h1 class="text-4xl md:text-7xl font-bold">A foundation<br />to build on.</h1></header>
+      <div class="flex justify-center mb-12"><Dock /></div>
+      <p class="skills-lead">Tools and techniques I’ve applied through my degree, internship, and projects. Explore an area to see the skills behind the work.</p>
+      <div class="skills-filters" aria-label="Filter skills by area">{categories.map((category) => <button type="button" data-skill-filter={category} aria-pressed={category === 'All skills' ? 'true' : 'false'}>{category}</button>)}</div>
+      <p class="skills-count" data-skills-count aria-live="polite">Showing {skills.length} skill areas</p>
+      <div class="skills-grid">
+        {skills.map((skill) => <article class="skill-area" data-skill-category={skill.category} data-reveal><p class="skill-category">{skill.category}</p><h2 class="text-lg font-medium mb-4">{skill.title}</h2><div class="flex flex-wrap gap-2 mb-5">{skill.tags.map((tag) => <span class="text-xs theme-text border theme-border rounded-full px-3 py-1">{tag}</span>)}</div><p class="theme-muted text-sm leading-relaxed">{skill.description}</p>{skill.title === 'Language models' && <a class="skill-evidence" href={sitePath('/works/language-model-fine-tuning')}>Applied in the maths fine-tuning project ↗</a>}{skill.title === 'Web application projects' && <a class="skill-evidence" href={sitePath('/works/sri-lanka-trip-planner')}>Applied in my chatbot contribution ↗</a>}{skill.title === 'Signal & image processing' && <a class="skill-evidence" href={sitePath('/works/hybrid-video-codec')}>Applied in the EE596 codec project ↗</a>}{skill.title === 'Machine learning & deep learning' && <a class="skill-evidence" href={sitePath('/works/cardiovascular-monitoring')}>Applied in final-year research ↗</a>}{skill.evidence && <a class="skill-evidence" href={sitePath('/works/network-coverage-changes')}>Applied in coverage detection ↗</a>}</article>)}
+      </div>
+      <div class="mt-16 skills-certification border-t theme-border pt-10"><p class="theme-muted text-xs uppercase tracking-widest mb-4">Certifications</p><h2 class="text-2xl mb-3">Deep Learning Specialization</h2><p class="theme-muted text-sm mb-5">DeepLearning.AI · Coursera</p><p class="theme-muted text-sm max-w-2xl leading-relaxed">Neural networks, hyperparameter tuning, regularization and optimization, structuring machine learning projects, convolutional neural networks, and sequence models.</p><a href="https://coursera.org/share/8a2f7d42eae134506b60bd45fad7c7e5" target="_blank" rel="noopener noreferrer" class="inline-block theme-text text-sm mt-5">View credential ↗</a></div>
+    </div>
+  </div>
+  <Contact />
+</Layout>
+
+<script>
+const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-skill-filter]')];
+const cards = [...document.querySelectorAll<HTMLElement>('[data-skill-category]')];
+buttons.forEach((button) => button.addEventListener('click', () => {
+  buttons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+  let count = 0;
+  cards.forEach((card) => { card.hidden = button.dataset.skillFilter !== 'All skills' && card.dataset.skillCategory !== button.dataset.skillFilter; if (!card.hidden) count++; });
+  const status = document.querySelector('[data-skills-count]');
+  if (status) status.textContent = `Showing ${count} skill ${count === 1 ? 'area' : 'areas'}`;
+}));
+</script>

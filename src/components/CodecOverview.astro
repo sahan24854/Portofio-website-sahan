@@ -1,0 +1,27 @@
+---
+import { sitePath } from '../lib/paths';
+import { codecRuns } from '../data/codec-project';
+const selected = codecRuns[2];
+const facts = [{value:'8 × 8',label:'Transform blocks'},{value:'16 × 16',label:'Documented motion blocks'},{value:'382 kbit',label:'Image coding budget'},{value:'2%',label:'Rate-control tolerance'}];
+---
+<div class="codec-overview">
+ <div class="case-facts" data-reveal>{facts.map(fact => <div><strong>{fact.value}</strong><span>{fact.label}</span></div>)}</div>
+ <section class="codec-explorer" id="codec-results" aria-labelledby="codec-results-heading" data-reveal>
+  <div><p class="section-kicker">Recorded experiment / Rate control</p><h2 id="codec-results-heading">A bit budget.<br />A visible trade-off.</h2><p class="codec-lead">Select a target to explore the notebook’s recorded results. More compression saves bits, while reducing reconstructed image quality.</p><div class="codec-run-controls" aria-label="Select a recorded encoding run">{codecRuns.map((run,index) => <button type="button" data-codec-run={index} aria-pressed={index===2?'true':'false'} aria-controls="codec-run-details">{run.target / 1000} kbit</button>)}</div>
+   <div class="codec-run-details" id="codec-run-details" aria-live="polite"><div><span>Encoded size</span><strong data-codec-bits>{selected.bits.toLocaleString('en-US')} bits</strong></div><div><span>Reconstruction PSNR</span><strong data-codec-psnr>{selected.psnr} dB</strong></div><div><span>Quantization scale</span><strong data-codec-q>{selected.q}</strong></div><div><span>Distance from target</span><strong data-codec-error>{(Math.abs(selected.bits-selected.target)/selected.target*100).toFixed(2)}%</strong></div></div>
+   <p class="codec-source-note">Recorded on one 720 × 480 image. These are saved notebook results, not live encoding or a video benchmark.</p>
+  </div>
+  <figure class="codec-target-image"><a href={sitePath('/projects/codec/target-budget.png')} target="_blank" rel="noopener noreferrer" aria-label="Open the original 382 kbit result figure"><img src={sitePath('/projects/codec/target-budget.png')} alt="Notebook output for the 382,000-bit target: Q-scale 5.39, 379,240 encoded bits, and PSNR 23.13 dB" width="640" height="476" loading="lazy" /></a><figcaption>Original notebook figure · 382 kbit target run <span aria-hidden="true">↗</span></figcaption></figure>
+ </section>
+ <section class="codec-evidence" id="codec-output" aria-labelledby="codec-output-heading" data-reveal><p class="section-kicker">From the repository</p><h2 id="codec-output-heading">Prediction leaves a residual.</h2><p>The provided video output compares the reference, current frame, prediction, and residual. Open the figure to inspect it at full size.</p><figure><a href={sitePath('/projects/codec/motion-prediction.png')} target="_blank" rel="noopener noreferrer"><img src={sitePath('/projects/codec/motion-prediction.png')} alt="Four original output panels: reference frame, current frame, predicted frame built from motion and intra prediction, and residual frame" width="1592" height="271" loading="lazy" /></a><figcaption>Repository output image · <a href="https://github.com/sahan24854/EE596-Project/blob/main/Video%20compression%20system%20outputs.png" target="_blank" rel="noopener noreferrer">View source ↗</a></figcaption></figure></section>
+</div>
+<script>
+import { codecRuns } from '../data/codec-project';
+const buttons=[...document.querySelectorAll<HTMLButtonElement>('[data-codec-run]')];
+buttons.forEach(button=>button.addEventListener('click',()=>{
+ const run=codecRuns[Number(button.dataset.codecRun)];if(!run)return;
+ buttons.forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+ const values={'[data-codec-bits]':`${run.bits.toLocaleString('en-US')} bits`,'[data-codec-psnr]':`${run.psnr.toFixed(2)} dB`,'[data-codec-q]':run.q.toFixed(2),'[data-codec-error]':`${(Math.abs(run.bits-run.target)/run.target*100).toFixed(2)}%`};
+ for(const [selector,value]of Object.entries(values)){const element=document.querySelector(selector);if(element)element.textContent=value;}
+}));
+</script>

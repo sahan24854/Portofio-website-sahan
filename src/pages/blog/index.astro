@@ -1,0 +1,98 @@
+---
+import { sitePath } from '../../lib/paths';
+import Layout from '../../layouts/Layout.astro';
+import Contact from '../../components/Contact.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+
+<Layout
+  title="Blog | Sahan Dissanayake"
+  description="Notes on learning, AI/ML, and telecommunications engineering by Sahan Dissanayake."
+  tags={["Machine Learning", "Telecommunications", "Engineering"]}
+>
+  <div class="theme-surface min-h-screen">
+
+    <!-- Top bar -->
+    <div class="flex justify-between items-start px-8 md:px-16 pt-8">
+      <a href={sitePath('/')} class="theme-muted text-xs tracking-wide hover:text-[#0a0a0a] transition-colors">
+        @ Sahan Dissanayake
+      </a>
+      <p class="theme-muted text-xs max-w-60 text-right leading-relaxed hidden md:block">
+        Learning and exploring AI/ML and telecommunications.
+      </p>
+    </div>
+
+    <div class="px-8 md:px-16 max-w-7xl mx-auto">
+
+      <!-- Heading -->
+      <div class="pt-16 pb-16 md:pt-20 md:pb-20 border-b theme-border">
+        <h1
+          class="theme-text font-bold lowercase"
+          style="font-size: clamp(40px, 6vw, 80px);"
+        >
+          thoughts &amp;<br />writings
+        </h1>
+      </div>
+
+      <!-- Post list -->
+      <ul class="divide-y divide-[#eee]">
+        {posts.map((post) => (
+          <li>
+            <a
+              href={sitePath(`/blog/${post.id}`)}
+              class="group flex flex-col md:flex-row md:items-start gap-4 md:gap-16 py-10 md:py-12"
+            >
+              <!-- Date + tags -->
+              <div class="shrink-0 md:w-48">
+                <time class="theme-muted text-xs font-mono">
+                  {formatDate(post.data.date)}
+                </time>
+                {post.data.tags.length > 0 && (
+                  <div class="flex flex-wrap gap-1.5 mt-2">
+                    {post.data.tags.map((tag) => (
+                      <span class="text-[10px] theme-muted border border-[#e0e0e0] rounded-full px-2 py-0.5 uppercase tracking-wide">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <!-- Title + excerpt -->
+              <div class="flex-1">
+                <h2 class="theme-text text-2xl md:text-3xl font-bold leading-snug group-hover:text-[#5b5bd6] transition-colors duration-200 mb-3">
+                  {post.data.title}
+                </h2>
+                <p class="theme-muted text-sm leading-relaxed line-clamp-2 max-w-xl">
+                  {post.data.description}
+                </p>
+              </div>
+
+              <!-- Arrow -->
+              <div class="shrink-0 self-start md:self-center">
+                <span class="w-8 h-8 rounded-full border theme-border flex items-center justify-center theme-muted group-hover:bg-[#0a0a0a] group-hover:text-white group-hover:border-[#0a0a0a] transition-all duration-200 text-sm">
+                  ↗
+                </span>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      {posts.length === 0 && (
+        <p class="theme-muted text-sm py-20 text-center">No posts yet. Check back soon.</p>
+      )}
+
+    </div>
+  </div>
+
+  <Contact />
+</Layout>

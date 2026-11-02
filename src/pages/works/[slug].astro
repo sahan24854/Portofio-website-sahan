@@ -1,0 +1,55 @@
+---
+import { sitePath } from '../../lib/paths';
+import Layout from '../../layouts/Layout.astro';
+import Contact from '../../components/Contact.astro';
+import NetworkOverview from '../../components/NetworkOverview.astro';
+import FypOverview from '../../components/FypOverview.astro';
+import CodecOverview from '../../components/CodecOverview.astro';
+import MathOverview from '../../components/MathOverview.astro';
+import ChatbotOverview from '../../components/ChatbotOverview.astro';
+import EcgOverview from '../../components/EcgOverview.astro';
+import { render } from 'astro:content';
+import { getWorks, type Work } from '../../lib/works';
+export async function getStaticPaths() {
+  const works = await getWorks();
+  return works.map((work, index) => ({ params: { slug: work.id }, props: { work, nextWork: works[(index + 1) % works.length] } }));
+}
+interface Props { work: Work; nextWork: Work; }
+const { work, nextWork } = Astro.props;
+const { Content, headings } = await render(work);
+const { title, description, bg, cover, icon, repo, demo, tags, year } = work.data;
+const isNetwork = work.id === 'network-coverage-changes';
+const isFyp = work.id === 'cardiovascular-monitoring';
+const isCodec = work.id === 'hybrid-video-codec';
+const isMath = work.id === 'language-model-fine-tuning';
+const isChatbot = work.id === 'sri-lanka-trip-planner';
+const isEcg = work.id === 'ecg-resnet';
+const context = isNetwork ? 'Internship case study / 01' : isFyp ? 'Final-year research / 02' : isCodec ? 'EE596 / Course project / 03' : isMath ? 'LLM experiment / 04' : isChatbot ? 'Chatbot contribution / 05' : 'ECG research / 06';
+const overviewAnchor = isNetwork ? '#at-a-glance' : isFyp ? '#fyp-architecture' : isCodec ? '#codec-results' : isMath ? '#math-results' : isChatbot ? '#chatbot-workflow' : '#ecg-results';
+const sections = headings.filter((heading) => heading.depth === 2);
+const readingMinutes = Math.max(1, Math.ceil((work.body ?? '').split(/\s+/).length / 200));
+---
+<Layout title={`${title} | Sahan Dissanayake`} description={description} image={cover} tags={tags}>
+  <div class="case-page">
+    <div class="case-topbar section-container"><a href={sitePath('/')} class="case-brand">Sahan Dissanayake<span>Engineering graduate · AI/ML &amp; Telecom</span></a><a href={sitePath('/works')}>← All projects</a></div>
+    <article class="section-container">
+      <header class="case-header" data-reveal>
+        <div class="case-header-copy"><p class="section-kicker">{context} · {year}</p><h1>{title}</h1><p class="case-intro">{description}</p><div class="case-actions">{repo && <a class="case-primary" href={repo} target="_blank" rel="noopener noreferrer">Explore repository ↗</a>}{demo && <a class="case-secondary" href={demo} target="_blank" rel="noopener noreferrer">Live demo ↗</a>}<a class="case-secondary" href={overviewAnchor}>Read case study ↓</a></div><p class="case-reading">{readingMinutes} min read{isNetwork && ' · Industry experience at Dialog Axiata'}</p></div>
+        <div class={`case-cover ${bg}`}>{cover ? <img src={sitePath(cover)} alt={`${title} project illustration`} width="800" height="500" fetchpriority="high" /> : icon ? <div set:html={icon} /> : null}</div>
+      </header>
+      <div class="case-stack" aria-label="Project technologies">{tags.map((tag) => <span>{tag}</span>)}</div>
+      {isNetwork && <NetworkOverview />}
+      {isFyp && <FypOverview />}
+      {isCodec && <CodecOverview />}
+      {isMath && <MathOverview />}
+      {isChatbot && <ChatbotOverview />}
+      {isEcg && <EcgOverview />}
+      <div class="case-reading-layout" id="case-content">
+        <aside class="case-sidebar"><nav aria-label="Case study sections"><p class="section-kicker">In this case study</p><div>{sections.map((heading) => <a href={`#${heading.slug}`}>{heading.text}</a>)}</div></nav>{isNetwork && <div class="case-context"><span>PROJECT CONTEXT</span><strong>Industry internship</strong><p>Network Analytics &amp; Automation<br />Dialog Axiata · 2026</p><a href={sitePath('/skills')}>Skills applied ↗</a></div>}</aside>
+        <div class="prose-content case-prose"><Content /></div>
+      </div>
+      <div class="case-next" data-reveal><div><p class="section-kicker">Keep exploring</p><a href={sitePath(`/works/${nextWork.id}`)}>{nextWork.data.title} <span aria-hidden="true">↗</span></a></div><a href={sitePath('/works')} class="case-secondary">All projects →</a></div>
+    </article>
+  </div>
+  <Contact />
+</Layout>

@@ -1,0 +1,54 @@
+---
+import { sitePath } from '../../lib/paths';
+import Layout from '../../layouts/Layout.astro';
+import Contact from '../../components/Contact.astro';
+import WorkCard from '../../components/WorkCard.astro';
+import { getWorks } from '../../lib/works';
+
+const works = await getWorks();
+---
+
+<Layout
+  title="Works | Sahan Dissanayake"
+  description="University and internship projects by Sahan Dissanayake, a recent engineering graduate interested in AI/ML and telecommunications."
+>
+
+  <div class="theme-surface min-h-screen">
+
+    <!-- Top bar -->
+    <div class="flex justify-between items-start px-8 md:px-16 pt-8">
+      <a href={sitePath('/')} class="theme-muted text-xs tracking-wide hover:text-[#0a0a0a] transition-colors">
+        @ Sahan Dissanayake
+      </a>
+      <p class="theme-muted text-xs max-w-60 text-right leading-relaxed hidden md:block">
+        Recent engineering graduate exploring
+        AI/ML and telecommunications engineering.
+      </p>
+    </div>
+
+    <!-- Page heading -->
+    <div class="px-8 md:px-16 pt-16 pb-20 md:pt-20 md:pb-24 max-w-7xl mx-auto">
+      <h1 class="theme-text font-bold lowercase"
+          style="font-size: clamp(40px, 6vw, 80px);">
+        learning through<br />
+        engineering projects
+      </h1>
+    </div>
+
+    <!-- Project grid -->
+    <div class="px-8 md:px-16 pb-20 max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {works.map((work) => <WorkCard work={work} />)}
+      </div>
+
+      {works.length === 0 && (
+        <p class="theme-muted text-sm py-20 text-center">No projects yet. Check back soon.</p>
+      )}
+    </div>
+
+  </div>
+
+  <!-- Contact + Footer same as landing -->
+  <Contact />
+
+</Layout>

@@ -1,0 +1,22 @@
+---
+import { mathResults } from '../data/remaining-projects';
+const facts=[{value:'360M',label:'SmolLM2 base model'},{value:'Rank 16',label:'LoRA adaptation'},{value:'633',label:'Completed training updates'},{value:'3 datasets',label:'Paired development comparison'}];
+---
+<div class="case-facts" data-reveal>{facts.map(fact=><div><strong>{fact.value}</strong><span>{fact.label}</span></div>)}</div>
+<section class="research-explorer" id="math-results" aria-labelledby="math-results-title" data-reveal>
+ <div class="research-intro"><p class="section-kicker">Fine-tuning / Measurement matters</p><h2 id="math-results-title">Better formatting.<br />Mixed maths results.</h2><p>Explore the original model and first adapter on the same 100 questions per dataset.</p><div class="research-controls" aria-label="Choose the math evaluation measure"><button type="button" data-math-view="correct" aria-pressed="true">Numeric correctness</button><button type="button" data-math-view="parseable" aria-pressed="false">Parseable answers</button></div><p class="research-note" data-math-note aria-live="polite">Official scoring counts unparseable answers as incorrect. These are inspected development results, not an untouched final holdout.</p></div>
+ <div class="comparison-chart"><div class="chart-legend"><span><i class="bar-base"></i>Original</span><span><i class="bar-tuned"></i>First adapter</span></div>{mathResults.map((row,index)=><div class="comparison-row"><h3>{row.name}<span data-math-count={index}>{row.base} → {row.tuned} / 100</span></h3><div class="comparison-track"><div class="bar-base" data-math-bar={`${index}-base`} style={`width:${row.base}%`}></div></div><div class="comparison-track"><div class="bar-tuned" data-math-bar={`${index}-tuned`} style={`width:${row.tuned}%`}></div></div></div>)}<p class="research-note">Arithmetic answer-evidence audit: 51 → 54 / 100. Much of the official arithmetic gain reflects formatting.</p></div>
+</section>
+<script>
+import { mathResults } from '../data/remaining-projects';
+const buttons=[...document.querySelectorAll<HTMLButtonElement>('[data-math-view]')];
+buttons.forEach(button=>button.addEventListener('click',()=>{
+ const parseable=button.dataset.mathView==='parseable';buttons.forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+ mathResults.forEach((row,i)=>{
+  const base=parseable?row.baseParseable:row.base,tuned=parseable?row.tunedParseable:row.tuned;
+  const label=document.querySelector(`[data-math-count="${i}"]`);if(label)label.textContent=`${base} → ${tuned} / 100`;
+  const first=document.querySelector<HTMLElement>(`[data-math-bar="${i}-base"]`),second=document.querySelector<HTMLElement>(`[data-math-bar="${i}-tuned"]`);if(first)first.style.width=`${base}%`;if(second)second.style.width=`${tuned}%`;
+ });
+ const note=document.querySelector('[data-math-note]');if(note)note.textContent=parseable?'Parseable answers match the evaluator’s answer format; they can still contain incorrect mathematics.':'Official scoring counts unparseable answers as incorrect. These are inspected development results, not an untouched final holdout.';
+}));
+</script>

@@ -1,0 +1,16 @@
+---
+import { chatStages } from '../data/remaining-projects';
+const facts=[{value:'Chatbot',label:'My contribution to the platform'},{value:'1–14 days',label:'Accepted trip duration'},{value:'3 catalogs',label:'Tours, villas & experiences'},{value:'Typed plans',label:'Shared UI & export structure'}];
+---
+<div class="case-facts" data-reveal>{facts.map(fact=><div><strong>{fact.value}</strong><span>{fact.label}</span></div>)}</div>
+<section class="research-explorer" id="chatbot-workflow" aria-labelledby="chatbot-workflow-title" data-reveal>
+ <div class="research-intro"><p class="section-kicker">My contribution / Conversational trip planning</p><h2 id="chatbot-workflow-title">A conversation.<br />A grounded itinerary.</h2><p>A chatbot integrated into an existing travel platform, connecting guest preferences with catalog-backed recommendations.</p><p class="research-note">Workflow illustration. This portfolio does not connect to the travel service or create bookings.</p></div>
+ <div class="chatbot-schematic" aria-label="Illustrative chatbot workflow"><div class="chat-prompt">“A five-day trip with wildlife and beach time.”</div><div class="chat-flow"><span>Preferences</span><span aria-hidden="true">→</span><span>Catalog + Gemini</span></div><div class="chat-schema"><span>Plan output</span><code>days → activities → listing IDs</code></div><div class="chat-verified"><span aria-hidden="true">✓</span><div><strong>Match IDs against catalog records</strong><small>Application data supplies listing-card details.</small></div></div><div class="chat-flow"><span>Timeline</span><span>PDF</span><span>Quote handoff</span></div></div>
+ <div class="chat-stage-controls research-controls" aria-label="Explore chatbot stages">{chatStages.map((stage,index)=><button type="button" data-chat-stage={index} aria-pressed={index===0?'true':'false'}>{stage.name}</button>)}</div>
+ <div class="chat-stage-detail" aria-live="polite"><h3 data-chat-title>{chatStages[0].title}</h3><p data-chat-description>{chatStages[0].description}</p></div>
+</section>
+<script>
+import { chatStages } from '../data/remaining-projects';
+const buttons=[...document.querySelectorAll<HTMLButtonElement>('[data-chat-stage]')];
+buttons.forEach(button=>button.addEventListener('click',()=>{const stage=chatStages[Number(button.dataset.chatStage)];if(!stage)return;buttons.forEach(item=>item.setAttribute('aria-pressed',String(item===button)));const title=document.querySelector('[data-chat-title]'),description=document.querySelector('[data-chat-description]');if(title)title.textContent=stage.title;if(description)description.textContent=stage.description;}));
+</script>

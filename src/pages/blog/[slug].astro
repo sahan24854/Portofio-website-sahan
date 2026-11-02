@@ -1,0 +1,108 @@
+---
+import { sitePath } from '../../lib/paths';
+import Layout from "../../layouts/Layout.astro";
+import Contact from "../../components/Contact.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+    const posts = await getCollection("blog");
+    return posts.map((post) => ({ params: { slug: post.id } }));
+}
+
+const { slug } = Astro.params;
+const posts = await getCollection("blog");
+const post = posts.find((p) => p.id === slug);
+if (!post) return Astro.redirect(sitePath("/blog"));
+
+const { Content } = await render(post);
+
+function formatDate(date: Date) {
+    return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
+}
+
+function readingTime(body: string) {
+    const words = body.trim().split(/\s+/).length;
+    return Math.max(1, Math.ceil(words / 200));
+}
+---
+
+<Layout
+    title={`${post.data.title} | Sahan Dissanayake`}
+    description={post.data.description}
+    type="article"
+    publishedDate={post.data.date}
+    tags={post.data.tags}
+>
+    <div class="theme-surface min-h-screen">
+        <!-- Top bar -->
+        <div class="flex justify-between items-start px-8 md:px-16 pt-8">
+            <a
+                href={sitePath('/')}
+                class="theme-muted text-xs tracking-wide hover:text-[#0a0a0a] transition-colors"
+            >
+                @ Sahan Dissanayake
+            </a>
+            <a
+                href={sitePath('/blog')}
+                class="theme-muted text-xs hover:text-[#0a0a0a] transition-colors"
+            >
+                ← All posts
+            </a>
+        </div>
+
+        <article class="px-8 md:px-16 max-w-4xl mx-auto">
+            <!-- Post header -->
+            <header
+                class="pt-16 pb-12 md:pt-20 md:pb-16 border-b theme-border"
+            >
+                {
+                    post.data.tags.length > 0 && (
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            {post.data.tags.map((tag) => (
+                                <span class="text-[10px] theme-muted border border-[#e0e0e0] rounded-full px-2.5 py-1 uppercase tracking-wide">
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                    )
+                }
+
+                <h1
+                    class="theme-text font-bold mb-6"
+                    style="font-size: clamp(32px, 5vw, 64px);"
+                >
+                    {post.data.title}
+                </h1>
+
+                <div
+                    class="flex items-center gap-4 theme-muted text-xs font-mono"
+                >
+                    <time>{formatDate(post.data.date)}</time>
+                    <span>·</span>
+                    <span>{post.body && readingTime(post.body)} min read</span>
+                </div>
+            </header>
+
+            <!-- Post content -->
+            <div class="prose-content py-12 md:py-16">
+                <Content />
+            </div>
+        </article>
+
+        <!-- Back link -->
+        <div class="px-8 md:px-16 max-w-4xl mx-auto pb-20">
+            <a
+                href={sitePath('/blog')}
+                class="inline-flex items-center gap-2 text-sm theme-text border theme-border rounded-full px-5 py-2.5 hover:border-[#0a0a0a] transition-colors duration-200"
+            >
+                ← Back to all posts
+            </a>
+        </div>
+    </div>
+
+    <Contact />
+</Layout>

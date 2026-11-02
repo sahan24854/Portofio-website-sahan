@@ -1,0 +1,31 @@
+---
+const facts = [{value:'2 inputs',label:'ECG + PPG waveforms'},{value:'1,000',label:'Samples per input'},{value:'384 → 64',label:'Fused features → latent space'},{value:'2 outputs',label:'Systolic + diastolic pressure'}];
+const modules = [
+  { label:'01 / Encode', title:'Two modalities, two residual branches.', text:'Separate 1D residual encoders learn ECG and PPG features. Cross-feature enhancement combines the modalities with channel attention and residual processing.' },
+  { label:'02 / Fuse', title:'Bring context and morphology together.', text:'A two-layer BiLSTM contributes a 256-dimensional context vector. Four modality-specific vectors contribute another 128 dimensions, forming the 384-dimensional fused representation.' },
+  { label:'03 / Estimate', title:'A probabilistic route to two outputs.', text:'The encoder produces mean and log-variance vectors for a 64-dimensional latent representation. Two regression heads estimate systolic and diastolic pressure. This diagram illustrates the architecture; it does not run the model.' },
+];
+---
+<div class="fyp-overview">
+  <div class="case-facts" data-reveal>{facts.map((fact) => <div><strong>{fact.value}</strong><span>{fact.label}</span></div>)}</div>
+  <section class="fyp-lab" id="fyp-architecture" aria-labelledby="fyp-architecture-heading" data-reveal>
+    <div><p class="section-kicker">Multimodal learning / Research prototype</p><h2 id="fyp-architecture-heading">Two waveforms.<br />A shared representation.</h2><p class="fyp-lab-intro">Explore how the implemented network combines complementary inputs before estimating blood pressure.</p></div>
+    <div class="fyp-schematic" aria-label="Architecture: ECG and PPG inputs feed feature fusion, a probabilistic encoder, and two blood-pressure regression heads">
+      <div class="waveform-panel"><span>ECG / electrical activity</span><svg viewBox="0 0 300 65" fill="none" aria-hidden="true"><path d="M0 38h30l8-8 10 8h12l8-20 9 40 11-56 10 36h25l8-8 10 8h25l8-20 9 40 11-56 10 36h25l8-8 10 8h35" /></svg></div>
+      <div class="waveform-panel waveform-ppg"><span>PPG / optical pulse waveform</span><svg viewBox="0 0 300 65" fill="none" aria-hidden="true"><path d="M0 53C20 53 20 5 35 8S50 38 60 33S75 53 90 53 110 5 125 8 140 38 150 33 165 53 180 53 200 5 215 8 230 38 240 33 255 53 270 53h30" /></svg></div>
+      <div class="fusion-connector" aria-hidden="true">↓</div><div class="fusion-core"><span>Feature fusion</span><strong>384 <span>→</span> 64</strong><span>Probabilistic encoding</span></div><div class="fyp-output"><span>SBP head</span><span>DBP head</span></div><p class="coverage-caption">Illustrative waveforms · no patient data or live predictions</p>
+    </div>
+    <div class="fyp-module-controls" aria-label="Explore model architecture">{modules.map((module, index) => <button type="button" data-fyp-module={index} aria-pressed={index===0 ? 'true':'false'} aria-controls="fyp-module-detail">{module.label}</button>)}</div>
+    <div id="fyp-module-detail" class="fyp-module-detail" aria-live="polite"><h3 data-fyp-title>{modules[0].title}</h3><p data-fyp-description>{modules[0].text}</p></div>
+  </section>
+</div>
+<script define:vars={{ modules }}>
+ const buttons = [...document.querySelectorAll('[data-fyp-module]')];
+ buttons.forEach(button => button.addEventListener('click', () => {
+   const module = modules[Number(button.dataset.fypModule)];
+   if (!module) return;
+   buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+   document.querySelector('[data-fyp-title]').textContent = module.title;
+   document.querySelector('[data-fyp-description]').textContent = module.text;
+ }));
+</script>
