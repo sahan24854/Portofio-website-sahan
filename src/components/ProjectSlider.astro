@@ -6,7 +6,7 @@ const { works } = Astro.props;
 const trackId = `projects-${Astro.url.pathname === '/' ? 'home' : 'index'}`;
 ---
 <div class="project-slider" data-project-slider role="region" aria-label="Engineering projects carousel" aria-roledescription="carousel">
-  <div class="project-slider-toolbar"><p data-project-range>{works.length} projects · Swipe or use the arrows</p><div class="project-slider-arrows"><button type="button" class="project-play" data-project-play aria-label="Pause project slideshow" aria-pressed="true">Pause</button><button type="button" data-project-prev aria-controls={trackId} aria-label="Previous projects">←</button><button type="button" data-project-next aria-controls={trackId} aria-label="Next projects">→</button></div></div>
+  <div class="project-slider-toolbar"><p data-project-range>{works.length} projects · Swipe or use the arrows</p><div class="project-slider-arrows"><button type="button" data-project-prev aria-controls={trackId} aria-label="Previous projects">←</button><button type="button" data-project-next aria-controls={trackId} aria-label="Next projects">→</button></div></div>
   <div class="project-slider-track" id={trackId} tabindex="0" aria-label="Project cards. Use left and right arrows to browse.">
     {works.map((work, index) => <div class="project-slide" role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${works.length}: ${work.data.title}`}><WorkCard work={work} /></div>)}
   </div>
@@ -19,31 +19,15 @@ const trackId = `projects-${Astro.url.pathname === '/' ? 'home' : 'index'}`;
   const next = slider.querySelector<HTMLButtonElement>('[data-project-next]')!;
   const range = slider.querySelector<HTMLElement>('[data-project-range]')!;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const play = slider.querySelector<HTMLButtonElement>('[data-project-play]')!;
-  let playing = !reduced.matches;
-  let visible = false;
-  let hovered = false;
-  let timer: number | undefined;
-  function syncPlayback() {
-   clearInterval(timer);
-   play.textContent = playing ? 'Pause' : 'Play';
-   play.setAttribute('aria-label', `${playing ? 'Pause' : 'Play'} project slideshow`);
-   play.setAttribute('aria-pressed', String(playing));
-   if (!playing || !visible || hovered || document.hidden || slider.contains(document.activeElement)) return;
-   timer = window.setInterval(() => {
-    if (next.disabled) track.scrollTo({left:0,behavior:reduced.matches?'instant':'smooth'});
-    else move(1);
-   }, 5000);
-  }
-  play.addEventListener('click',()=>{playing=!playing;syncPlayback();});
-  slider.addEventListener('mouseenter',()=>{hovered=true;syncPlayback();});
-  slider.addEventListener('mouseleave',()=>{hovered=false;syncPlayback();});
-  slider.addEventListener('focusin',syncPlayback);
-  slider.addEventListener('focusout',()=>requestAnimationFrame(syncPlayback));
-  track.addEventListener('pointerdown',()=>{playing=false;syncPlayback();});
-  document.addEventListener('visibilitychange',syncPlayback);
-  reduced.addEventListener('change',()=>{if(reduced.matches)playing=false;syncPlayback();});
-  new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;syncPlayback();},{threshold:.3}).observe(slider);
+  let revealed = false;
+  new IntersectionObserver(entries => {
+   if (!entries[0].isIntersecting || revealed) return;
+   revealed = true;
+   if (!reduced.matches) track.animate(
+    [{opacity:.55,translate:'28px 0'},{opacity:1,translate:'0 0'}],
+    {duration:800,easing:'cubic-bezier(.22,.61,.36,1)'}
+   );
+  }, {threshold:.15}).observe(slider);
   function update() {
    const start = Math.round(track.scrollLeft / (cards[0].getBoundingClientRect().width + 28));
    const visible = innerWidth >= 768 ? 2 : 1;
@@ -52,7 +36,7 @@ const trackId = `projects-${Astro.url.pathname === '/' ? 'home' : 'index'}`;
    next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
   }
   function move(direction: number) {track.scrollBy({left:direction * (cards[0].getBoundingClientRect().width + 28),behavior:reduced.matches?'instant':'smooth'});}
-  prev.addEventListener('click',()=>{playing=false;syncPlayback();move(-1);}); next.addEventListener('click',()=>{playing=false;syncPlayback();move(1);});
+  prev.addEventListener('click',()=>move(-1)); next.addEventListener('click',()=>move(1));
   track.addEventListener('keydown',event=>{if(event.target!==track)return;if(event.key==='ArrowRight'||event.key==='ArrowLeft'){event.preventDefault();move(event.key==='ArrowRight'?1:-1);}});
   track.addEventListener('scroll',update,{passive:true});new ResizeObserver(update).observe(track);update();
  });
@@ -61,7 +45,6 @@ const trackId = `projects-${Astro.url.pathname === '/' ? 'home' : 'index'}`;
 .project-slider {min-width:0}
 .project-slider-toolbar {display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px;color:var(--muted);font-size:12px}
 .project-slider-arrows {display:flex;gap:8px}.project-slider-arrows button {display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--text);font-size:20px;cursor:pointer}.project-slider-arrows button:hover:not(:disabled){background:var(--accent);color:var(--accent-on)}.project-slider-arrows button:disabled{opacity:.3;cursor:default}
-.project-play {font-size:11px!important;width:58px!important;border-radius:24px!important}
 .project-slider-track {display:flex;flex-wrap:nowrap;gap:28px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent;padding-bottom:20px;align-items:stretch}
 .project-slide {flex:0 0 calc((100% - 28px)/2);min-width:0;scroll-snap-align:start;scroll-snap-stop:always}
 .project-slide :global(.project-card){height:100%}
